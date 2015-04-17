@@ -1,0 +1,153 @@
+<html ng-app="DTCFtnApp">
+
+<head>
+    <title>Letter Name Fluency Practice</title>
+    <!--<link rel="stylesheet" href="Assets/jquery.mobile-1.0.min.css" />
+    <script src="Assets/jquery.js"></script>
+    <script type="text/javascript" src="Assets/jquery.mobile-1.0.min.js"></script>-->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script>
+    <script src="Assets/fastclick.js"></script>
+
+    <meta name="viewport" content="width=device-width" />
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-2315326-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script>
+        var hTimeout;
+        var iCorrectAnswers;
+        var bTimer = true;
+        var iTimer = 60;
+
+        //var aConsanants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'];
+        var aInitialConsanants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'y', 'z']; // no 'x'
+        var aFinalConsanants = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'z']; // no 'y'
+        var aVowels = ['a', 'e', 'i', 'o', 'u'];
+        var aDisallowedWords = ['sex','dic','dik','dic','coc','kok','cok','koc','fuk','fuc','tit','cum']
+
+        $(function () {
+            FastClick.attach(document.body); // fix the 300ms delay
+            $('#btnMainMenu').click(function () {
+                clearTimeout(hTimeout);
+            })
+            Init_Game();
+            LoadOptions();
+        });
+
+        function Init_Game() {
+            iCorrectAnswers = -1;
+
+            $('#btnStart').show();
+            $('#btnGetNextWord').hide();
+
+            $('#WhatsThisWord').html('&nbsp;');
+            $('#WhatsThisWord').click(function () {
+                StartGame();
+            });
+        }
+
+        function StartGame() {
+            $('#btnStart').hide();
+            $('#btnGetNextWord').show();
+
+            $('#btnGetNextWord').unbind('click').click(function () {
+                GetNextWord();
+            });
+            $('#WhatsThisWord').unbind('click').click(function () {
+                GetNextWord();
+            });
+            StartTimer();
+            GetNextWord();
+        }
+
+        function GetNextWord() {
+            iCorrectAnswers++;
+            do {
+                var i = Math.floor(Math.random() * (aInitialConsanants.length - 1));
+                var x = Math.floor(Math.random() * (aFinalConsanants.length - 1));
+                var y = Math.floor(Math.random() * (aVowels.length - 1));
+                var nextWord = aInitialConsanants[i] + aVowels[y] + aFinalConsanants[x]
+            } while (aDisallowedWords.indexOf(nextWord) > -1);
+
+            $('#WhatsThisWord').text(nextWord);
+            return;
+        }
+
+        function StartTimer() {
+            if (bTimer)
+                hTimeout = setTimeout(function () {
+                    $.mobile.navigate("#results", { info: "info about the #bar hash" });
+                    $('#ResultMsg').text("You named " + iCorrectAnswers + " words in " + iTimer + " seconds!");
+                },
+                iTimer * 1000);
+        }
+
+        function LoadOptions() {
+            $('#ckTimer').prop("checked", bTimer);
+
+            $('#txtTimer').val(iTimer);
+            $("#txtTimer").change(function () { iTimer = $('#txtTimer').val() });
+
+            $('#ckTimer').click(function () {
+                $("#ckTimer").toggle(this.checked);
+                bTimer = this.checked;
+            });
+        }
+    </script>
+
+</head>
+<body style="background-color:#000000;">
+
+    <div data-role="page" id="game" data-theme="a">
+        <noscript><div class="ui-content ui-body-a"><p>This site requires JavaScript. You must enable JavaScript to load functionality.</p></div></noscript>
+        <div data-role="header">
+            <h1>Silly Word Practice</h1><a href="index.html">Menu</a><a href="#options">options</a>
+        </div>
+        <div data-role="ui-content" data-theme="a">
+            <div data-role="controlgroup">
+                <div id="WhatsThisWord" style="text-align: center; font-family: Arial, Helvetica, sans-serif; font-size: 33vh;">&nbsp;</div>
+                <a id="btnStart" data-theme="a" onclick="StartGame();" data-role="button">Let's Get Started!</a>
+                <a id="btnGetNextWord" data-theme="a" data-role="button">Next</a>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="page" id="options" data-theme="a">
+        <div data-role="header">
+            <h1>Options</h1><a href="#game" data-direction="reverse" onclick="Init_Game();">Play Again</a>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <label for="ckTimer">Timer (in seconds)</label><input type="checkbox" id="ckTimer" /> <input type="text" id="txtTimer" />
+        </div><!-- /content -->
+
+        <div data-role="footer">
+            <h4>Page Footer</h4>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+
+    <div data-role="page" id="results" data-theme="a">
+        <div data-role="header">
+            <h1>Great Job!</h1><a href="#game" data-direction="reverse" onclick="Init_Game();">Play Again</a><a href="#options">options</a>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <div style="text-align:center;">
+                <h3>Great job! <div style="display:block;" id="ResultMsg">You Named a lot of Letters!</div></h3>
+            </div>
+        </div><!-- /content -->
+    </div><!-- /page -->
+
+
+</body>
+</html>
